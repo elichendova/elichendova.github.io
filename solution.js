@@ -1,43 +1,37 @@
 function solve() {
-  let answers = [];
-  let key = [2, 4, 2];
-  let questionCounter = 0;
-  let correctAnswersCounter = 0;
-  let btns = document.querySelectorAll(".quiz-answer");
-  let resultScreen = document.querySelector("#results");
+   let productsAll = document.querySelectorAll(".add-product");
+   let textarea = document.querySelector("textarea");
+   let checkoutBtn = document.querySelectorAll(".checkout")[0];
+   let btnsAll = document.querySelectorAll("button");
+   let productsSelected = [];
 
+   for (let i = 0; i < productsAll.length; i++) {
+      productsAll[i].addEventListener("click", addToCart);
+   }
 
-  for (let j = 0; j < btns.length; j++) {
-    btns[j].addEventListener("click", () => {
-      let section = document.getElementsByTagName("section")[questionCounter];
-      let nextSection = document.getElementsByTagName("section")[questionCounter + 1];
-
-      section.style.display = "none";
-      if (questionCounter < 2) {
-        nextSection.style.display = "block";
+   function addToCart(event) {
+      let product = event.target.parentNode.parentNode;
+      let name = product.children[1].children[0].innerHTML;
+      let price = +product.children[3].innerHTML;
+      let productSelected = {
+         "Name": name,
+         "Price": price
       }
-      questionCounter++;
-      answers.push(+btns[j].getAttribute("data-quizIndex"));
+      productsSelected.push(productSelected);
+      let addedProduct = `Added ${productSelected.Name} for ${productSelected.Price.toFixed(2)} to the cart.\n`;
+      textarea.value += addedProduct;
+   }
 
-      /*After all answers are answered, show result screen*/
-      if (questionCounter === 3) {
-        resultScreen.style.display = "block";
-        let heading = document.querySelector(".results-inner h1");
+   checkoutBtn.addEventListener("click", () => {
+      let listNoFilter = productsSelected.map(p => p.Name);
+      let list = [...new Set(listNoFilter)];
+      let totalPrice = productsSelected.map(x => x.Price).reduce((a, b) => { return a + b }, 0).toFixed(2);
+      textarea.value += `You bought ${list.join(", ")} for ${totalPrice}.`;
 
-        /*Check number of correct answers*/
-        for (let i = 0; i < questionCounter; i++) {
-          if (answers[i] === key[i]) {
-            correctAnswersCounter++;
-          }
-        }
+      for (let j = 0; j < btnsAll.length; j++) {
+         btnsAll[j].disabled = true;
 
-        /*Display result*/
-        if (correctAnswersCounter === questionCounter) {
-          heading.innerHTML = "You are recognized as top JavaScript fan!";
-        } else {
-          heading.innerHTML = `You have ${correctAnswersCounter} right answers`;
-        }
       }
-    });
-  }
+   })
 }
+
